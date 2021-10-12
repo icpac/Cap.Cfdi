@@ -1,4 +1,15 @@
-﻿using System;
+﻿#region tit
+/*
+{+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++)
+{                                                                   }
+{     tit Cap control administrativo personal                       }
+{     Cuestiones sobre cfdi                                         }
+{                                                                   }
+{*******************************************************************}
+ */
+#endregion
+
+using System;
 using System.Diagnostics;
 using System.IO;
 using Cap.Fe.BusinessObjects;
@@ -96,15 +107,10 @@ namespace Cap.Cfdi
 
         public static void LoadData(FilterCFDI obj, IObjectSpace obs, string cnnS)
         {
-            // aquí debe convertir los bytes del archivo cargado hacia libro excel
-
-            // errorEn = "No se pudo cargar el archivo. Posiblemente esté dañado o no corresponda al formato adecuado.";
             Workbook wb = new Workbook();
-
             DocumentFormat tipoLibro = Path.GetExtension(obj.File.FileName.ToUpper()).Contains("XLSX") ? DocumentFormat.Xlsx : DocumentFormat.Xls;
             wb.LoadDocument(obj.File.Content, tipoLibro);
 
-            // errorEn = "No se pudo procesar el archivo. Posiblemente esté dañado.";
             if (wb != null && wb.Worksheets.Count > 0)
             {
                 if (obj.FrmnsPg)
@@ -235,7 +241,8 @@ namespace Cap.Cfdi
             }
         }
 
-        private static void cargaFormaPago(Worksheet ws, int renIni, IObjectSpace obs)
+        private static void cargaFormaPago(Worksheet ws, int renIni, 
+            IObjectSpace obs)
         {
             int iclave, idscrpcn;
             string colClave = "A";
@@ -248,7 +255,7 @@ namespace Cap.Cfdi
             if (rango.ColumnCount >= 3)
             {
                 int i, clv;
-                IObjectSpace objectSpace = obs; // Application.CreateObjectSpace();
+                IObjectSpace objectSpace = obs;
 
                 for (i = renIni - 1; i < rango.RowCount; i++)
                 {
@@ -265,13 +272,13 @@ namespace Cap.Cfdi
                             pg.Tipo = TipoPago.FormaPago;
                         }
                     }
-
                 }
                 objectSpace.CommitChanges();
             }
         }
 
-        private static void cargaMetodoPago(Worksheet ws, int renIni, int renFin, IObjectSpace obs)
+        private static void cargaMetodoPago(Worksheet ws, int renIni, 
+            int renFin, IObjectSpace obs)
         {
             int iclave, idscrpcn;
             string colClave = "A";
@@ -285,7 +292,7 @@ namespace Cap.Cfdi
             {
                 int i;
                 string clv;
-                IObjectSpace objectSpace = obs; // Application.CreateObjectSpace();
+                IObjectSpace objectSpace = obs; 
                 int rf = renFin == 0 ? rango.RowCount : renFin;
 
                 for (i = renIni - 1; i < rf; i++)
@@ -300,7 +307,7 @@ namespace Cap.Cfdi
 
                             pg.Clv = clv;
                             pg.Descrip = CeldaTexto(ws, i, idscrpcn);
-                            pg.Tipo = TipoPago.Metodo; //.Leyenda;
+                            pg.Tipo = TipoPago.Metodo;
                         }
                     }
                 }
@@ -311,7 +318,8 @@ namespace Cap.Cfdi
         /*Ago 2020 Están cambiando el tamaño de los campos
          y aunque hay que verificarlo, una opción es que no se 
         caiga por ello */
-        private static void cargaRegimen(Worksheet ws, int renIni, IObjectSpace obs)
+        private static void cargaRegimen(Worksheet ws, int renIni, 
+            IObjectSpace obs)
         {
             int iclave, idscrpcn;
             string colClave = "A";
@@ -346,7 +354,8 @@ namespace Cap.Cfdi
             }
         }
 
-        private static void cargaUsoCfdi(Worksheet ws, int renIni, IObjectSpace obs)
+        private static void cargaUsoCfdi(Worksheet ws, int renIni, 
+            IObjectSpace obs)
         {
             int iclave, idscrpcn;
             string colClave = "A";
@@ -360,7 +369,7 @@ namespace Cap.Cfdi
             {
                 int i;
                 string clv;
-                IObjectSpace objectSpace = obs; // Application.CreateObjectSpace();
+                IObjectSpace objectSpace = obs;
 
                 for (i = renIni - 1; i < rango.RowCount; i++)
                 {
@@ -382,7 +391,8 @@ namespace Cap.Cfdi
             }
         }
 
-        private static void cargaProdServ(Worksheet ws, int renIni, int renFin, IObjectSpace obs, string cnS)
+        private static void cargaProdServ(Worksheet ws, int renIni, 
+            int renFin, IObjectSpace obs, string cnS)
         {
             int iclave, idscrpcn;
             string colClave = "A";
@@ -396,7 +406,7 @@ namespace Cap.Cfdi
             {
                 int i;
                 string clv;
-                IObjectSpace objectSpace = obs; // Application.CreateObjectSpace();
+                IObjectSpace objectSpace = obs;
                 int rf = renFin == 0 ? rango.RowCount : renFin;
 
                 for (i = renIni - 1; i < rf; i++)
@@ -413,28 +423,8 @@ namespace Cap.Cfdi
 
                     if (!string.IsNullOrEmpty(clv))
                     {
-                        /*
-                        ProductoServicio ps = objectSpace.CreateObject<ProductoServicio>();
-
-                        ps.Clv = clv;
-                        ps.Dscrpcn = Negocio.CeldaTexto(ws, i, idscrpcn);*/
-                        // ps.Save(); No funciona sin Save y con Save
-
-                        /*
-                        if (i % 16 == 0)
-                        {
-                            objectSpace.CommitChanges();
-                            objectSpace.Dispose();
-                            objectSpace = Application.CreateObjectSpace();
-                        }*/
-
                         if (objectSpace.FindObject<ProductoServicio>(new BinaryOperator("Clv", clv)) == null)
                         {
-                            /*
-                            string insertQuery = string.Format("INSERT INTO \"ProductoServicio\" (\"Oid\", \"Clv\", \"Dscrpcn\") VALUES ('{0}', '{1}', '{2}')", Guid.NewGuid(), clv, NegocioAdmin.CeldaTexto(ws, i, idscrpcn));
-
-                            ((DevExpress.ExpressApp.Xpo.XPObjectSpace)objectSpace).Session.ExecuteNonQuery(insertQuery);*/
-
                             string insertQuery = string.Empty;
                             if (!cnS.Contains("postgres"))
                             {
@@ -454,22 +444,8 @@ namespace Cap.Cfdi
                             ((DevExpress.ExpressApp.Xpo.XPObjectSpace)objectSpace).Session.ExecuteNonQuery(
                                 insertQuery, new string[] { "d" }, new object[] { CeldaTexto(ws, i, idscrpcn) });
                         }
-                        /*
-                        else
-                        {
-                            string updateQuery = string.Empty;
-                            if (clv.CompareTo("70101500") >= 0)
-                            {
-                                updateQuery = string.Format(@"UPDATE [ProductoServicio] ([Oid], [Clv], [Dscrpcn]) VALUES ('{0}', '{1}', @d)", Guid.NewGuid(), clv);
-                            }
-                            else
-                            {
-                            }
-                        }*/
                     }
                 }
-                /*
-                objectSpace.CommitChanges();*/
             }
         }
 
@@ -491,11 +467,7 @@ namespace Cap.Cfdi
             {
                 int i;
                 string clv;
-                IObjectSpace objectSpace = obs; // Application.CreateObjectSpace();
-
-                /*
-                UnitOfWork uw = new UnitOfWork(((DevExpress.ExpressApp.Xpo.XPObjectSpaceProvider)
-                    Application.ObjectSpaceProvider).DataLayer);*/
+                IObjectSpace objectSpace = obs; 
 
                 for (i = renIni - 1; i < rango.RowCount; i++)
                 {
@@ -522,28 +494,19 @@ namespace Cap.Cfdi
                             und.Siglas = CeldaTexto(ws, i, isgls);
 
 
-                            // ps.Save(); No funciona sin Save y con Save
-
                             if (i % 64 == 0)
                             {
                                 objectSpace.CommitChanges();
-                                /* TIT Jun 2018, y si lo vuelvo a usar porque aqui no tengo la Application !
-                                objectSpace.Dispose();
-                                objectSpace = Application.CreateObjectSpace();*/
                             }
                         }
-
-                        /*
-                        string insertQuery = string.Format(@"INSERT INTO [ProductoServicio] ([Oid], [Clv], [Dscrpcn]) VALUES ('{0}', '{1}', @d)", Guid.NewGuid(), clv);
-
-                        ((DevExpress.ExpressApp.Xpo.XPObjectSpace)objectSpace).Session.ExecuteNonQuery(insertQuery, new string[] { "d" }, new object[] { Negocio.CeldaTexto(ws, i, idscrpcn) });*/
                     }
                 }
                 objectSpace.CommitChanges();
             }
         }
 
-        private static void cargaMonedas(Worksheet ws, int renIni, IObjectSpace obs)
+        private static void cargaMonedas(Worksheet ws, int renIni, 
+            IObjectSpace obs)
         {
             int iclave, idscrpcn;
             string colClave = "A";
@@ -556,7 +519,7 @@ namespace Cap.Cfdi
             if (rango.ColumnCount >= 3)
             {
                 int i;
-                IObjectSpace objectSpace = obs; // Application.CreateObjectSpace();
+                IObjectSpace objectSpace = obs; 
 
                 for (i = renIni - 1; i < rango.RowCount; i++)
                 {
@@ -576,7 +539,8 @@ namespace Cap.Cfdi
             }
         }
 
-        private static void cargaImpuestos(Worksheet ws, int renIni, IObjectSpace obs)
+        private static void cargaImpuestos(Worksheet ws, int renIni, 
+            IObjectSpace obs)
         {
             int iclave, idscrpcn, irtn, itrs;
             string colClave = "A";
@@ -593,7 +557,7 @@ namespace Cap.Cfdi
             if (rango.ColumnCount >= 3)
             {
                 int i;
-                IObjectSpace objectSpace = obs; // Application.CreateObjectSpace();
+                IObjectSpace objectSpace = obs;
 
                 for (i = renIni - 1; i < rango.RowCount; i++)
                 {
@@ -610,7 +574,6 @@ namespace Cap.Cfdi
                         impt.Dscrpcn = CeldaTexto(ws, i, idscrpcn);
                         impt.Rtncn = CeldaTexto(ws, i, irtn) == "Si";
                         impt.Trsld = CeldaTexto(ws, i, itrs) == "Si";
-
                         //  viene un dato de numero de decimales que no se si se use
                     }
                 }
@@ -618,7 +581,8 @@ namespace Cap.Cfdi
             }
         }
 
-        private static void cargaTipoRelacion(Worksheet ws, int renIni, IObjectSpace obs)
+        private static void cargaTipoRelacion(Worksheet ws, int renIni, 
+            IObjectSpace obs)
         {
             int iclave, idscrpcn;
             string colClave = "A";
@@ -631,7 +595,7 @@ namespace Cap.Cfdi
             if (rango.ColumnCount >= 3)
             {
                 int i;
-                IObjectSpace objectSpace = obs; // Application.CreateObjectSpace();
+                IObjectSpace objectSpace = obs;
 
                 for (i = renIni - 1; i < rango.RowCount; i++)
                 {
@@ -668,7 +632,8 @@ namespace Cap.Cfdi
             }
         }
 
-        private static void cargaTipoPercepcion(Worksheet ws, int renIni, IObjectSpace obs)
+        private static void cargaTipoPercepcion(Worksheet ws, 
+            int renIni, IObjectSpace obs)
         {
             int iclave, idscrpcn;
             string colClave = "A";
@@ -681,7 +646,7 @@ namespace Cap.Cfdi
             if (rango.ColumnCount >= 3)
             {
                 int i;
-                IObjectSpace objectSpace = obs; // Application.CreateObjectSpace();
+                IObjectSpace objectSpace = obs;
 
                 for (i = renIni - 1; i < rango.RowCount; i++)
                 {
@@ -705,7 +670,6 @@ namespace Cap.Cfdi
 
                         impt.Clave = aux3;
                         impt.Descrip = CeldaTexto(ws, i, idscrpcn);
-
                         //  viene un dato de numero de decimales que no se si se use
                     }
                 }
@@ -713,7 +677,8 @@ namespace Cap.Cfdi
             }
         }
 
-        private static void cargaTipoDeduccion(Worksheet ws, int renIni, IObjectSpace obs)
+        private static void cargaTipoDeduccion(Worksheet ws, int renIni, 
+            IObjectSpace obs)
         {
             int iclave, idscrpcn;
             string colClave = "A";
@@ -726,7 +691,7 @@ namespace Cap.Cfdi
             if (rango.ColumnCount >= 3)
             {
                 int i;
-                IObjectSpace objectSpace = obs; // Application.CreateObjectSpace();
+                IObjectSpace objectSpace = obs;
 
                 for (i = renIni - 1; i < rango.RowCount; i++)
                 {
@@ -750,7 +715,6 @@ namespace Cap.Cfdi
 
                         impt.Clave = aux3;
                         impt.Descrip = CeldaTexto(ws, i, idscrpcn);
-
                         //  viene un dato de numero de decimales que no se si se use
                     }
                 }
@@ -758,7 +722,8 @@ namespace Cap.Cfdi
             }
         }
 
-        private static void cargaRiesgos(Worksheet ws, int renIni, IObjectSpace obs)
+        private static void cargaRiesgos(Worksheet ws, int renIni, 
+            IObjectSpace obs)
         {
             int iclave, idscrpcn;
             string colClave = "A";
@@ -781,7 +746,6 @@ namespace Cap.Cfdi
                     if (aux != 0)
                     {
                         aux2 = aux.ToString();
-                        //aux3 = aux2.PadLeft(3, '0');
                         aux3 = aux2;
                     }
                     else
@@ -796,7 +760,6 @@ namespace Cap.Cfdi
 
                         impt.Clave = aux3;
                         impt.Descrip = CeldaTexto(ws, i, idscrpcn);
-
                         //  viene un dato de numero de decimales que no se si se use
                     }
                 }
@@ -804,7 +767,8 @@ namespace Cap.Cfdi
             }
         }
 
-        private static void cargaIncapacidad(Worksheet ws, int renIni, IObjectSpace obs)
+        private static void cargaIncapacidad(Worksheet ws, int renIni, 
+            IObjectSpace obs)
         {
             int iclave, idscrpcn;
             string colClave = "A";
@@ -817,7 +781,7 @@ namespace Cap.Cfdi
             if (rango.ColumnCount >= 3)
             {
                 int i;
-                IObjectSpace objectSpace = obs; // Application.CreateObjectSpace();
+                IObjectSpace objectSpace = obs;
 
                 for (i = renIni - 1; i < rango.RowCount; i++)
                 {
@@ -841,7 +805,6 @@ namespace Cap.Cfdi
 
                         impt.Clave = aux3;
                         impt.Descrip = CeldaTexto(ws, i, idscrpcn);
-
                         //  viene un dato de numero de decimales que no se si se use
                     }
                 }
@@ -849,7 +812,8 @@ namespace Cap.Cfdi
             }
         }
 
-        private static void cargaTipoContratos(Worksheet ws, int renIni, IObjectSpace obs)
+        private static void cargaTipoContratos(Worksheet ws, int renIni, 
+            IObjectSpace obs)
         {
             int iclave, idscrpcn;
             string colClave = "A";
@@ -862,7 +826,7 @@ namespace Cap.Cfdi
             if (rango.ColumnCount >= 3)
             {
                 int i;
-                IObjectSpace objectSpace = obs; // Application.CreateObjectSpace();
+                IObjectSpace objectSpace = obs; 
 
                 for (i = renIni - 1; i < rango.RowCount; i++)
                 {
@@ -884,9 +848,8 @@ namespace Cap.Cfdi
                     {
                         Contratacion impt = objectSpace.CreateObject<Contratacion>();
 
-                        impt.Clave = aux3; // TIT Oct 2018 Convert.ToUInt16(aux3);
+                        impt.Clave = aux3;
                         impt.Descrip = CeldaTexto(ws, i, idscrpcn);
-
                         //  viene un dato de numero de decimales que no se si se use
                     }
                 }
@@ -894,7 +857,8 @@ namespace Cap.Cfdi
             }
         }
 
-        private static void cargaCatalogosNomina(Worksheet ws, int renIni, int tpCtlg, IObjectSpace obs)
+        private static void cargaCatalogosNomina(Worksheet ws, int renIni, int tpCtlg, 
+            IObjectSpace obs)
         {
             int iclave, idscrpcn;
             string colClave = "A";
@@ -907,7 +871,7 @@ namespace Cap.Cfdi
             if (rango.ColumnCount >= 3)
             {
                 int i;
-                IObjectSpace objectSpace = obs; // Application.CreateObjectSpace();
+                IObjectSpace objectSpace = obs;
 
                 for (i = renIni - 1; i < rango.RowCount; i++)
                 {
@@ -924,6 +888,7 @@ namespace Cap.Cfdi
                         aux2 = CeldaTexto(ws, i, iclave);
                         aux3 = aux2.Trim();
                     }
+                    
                     //*TIT Oct 2018 dónde está CatalogoNomina?
                     if (!string.IsNullOrEmpty(aux3)
                         && objectSpace.FindObject<CatalogoNomina>(new BinaryOperator("Clv", aux3)) == null)
@@ -936,9 +901,8 @@ namespace Cap.Cfdi
                             impt.Tp = ETIPONOMINA.Periodicidad;
                         else if (tpCtlg == 1)
                             impt.Tp = ETIPONOMINA.TipoNomina;
-
                         //  viene un dato de numero de decimales que no se si se use
-                    }//*/
+                    }
                 }
                 objectSpace.CommitChanges();
             }
@@ -980,9 +944,8 @@ namespace Cap.Cfdi
                     {
                         RegimenContrato impt = objectSpace.CreateObject<RegimenContrato>();
 
-                        impt.Clave = aux3; // TIT Oct 2018 Convert.ToUInt16(aux3);
+                        impt.Clave = aux3;
                         impt.Descrip = CeldaTexto(ws, i, idscrpcn);
-
                         //  viene un dato de numero de decimales que no se si se use
                     }
                 }
@@ -1026,9 +989,8 @@ namespace Cap.Cfdi
                     {
                         Jornada impt = objectSpace.CreateObject<Jornada>();
 
-                        impt.Clave = aux3; // TIT Oct 2018 Convert.ToUInt16(aux3);
+                        impt.Clave = aux3;
                         impt.Dscrpcn = CeldaTexto(ws, i, idscrpcn);
-
                         //  viene un dato de numero de decimales que no se si se use
                     }
                 }
